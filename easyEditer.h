@@ -5,18 +5,21 @@
 class easyEditer_lib
 {
 public:
-	void begin(String filePath);
+	void begin(String pageName);
 	void setProgram();
 	void startProgram();
 private:
-	String edittext;
-	void compile();
+	String _edittext;
+	String _page;
+	String compile();
 	int searchMode(const char* mode);
-	void createCode(int m, const char* c);
+	bool createCode(int m,char* c);
 
 	int pinString(String s);
 
 	int stateString(String s);
+
+	String escapeParameter(String param);
 
 };
 #endif
