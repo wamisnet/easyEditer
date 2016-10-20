@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For nefry
+####################################### 
+# Class
+#######################################
+
+easyEditer			KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+begin				KEYWORD2
+setTrigger			KEYWORD2
+compileProgram			KEYWORD2
+setProgram			KEYWORD2
+getProgram			KEYWORD2
+
+
+#######################################
+# Constants
+#######################################
+ 
