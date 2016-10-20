@@ -6,14 +6,16 @@ class easyEditer_lib
 {
 public:
 	void begin(String pageName);
-	void setProgram();
-	void startProgram();
+	String setProgram();
+	String compileTestProgram();
 private:
 	String _edittext;
 	String _page;
-	String compile();
+	String compile(bool run);
 	int searchMode(const char* mode);
-	bool createCode(int m,char* c);
+	int stringTostate(int set, char * c);
+	String stringTopin(int set, const char * c);
+	int createCode(int mode,char* c,bool run);
 
 	int pinString(String s);
 
