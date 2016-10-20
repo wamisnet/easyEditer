@@ -2,12 +2,17 @@
 #define EASYEDIT_h
 #include<Arduino.h>
 #include<Nefry.h>
-class easyEditer_lib
+class easyEditer
 {
 public:
 	void begin(String pageName);
-	String setProgram();
+
+	String setTrigger();
 	String compileTestProgram();
+
+	void setProgram(String program);
+	String getProgram();
+	
 private:
 	String _edittext;
 	String _page;

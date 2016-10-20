@@ -1,7 +1,7 @@
 ﻿#include "easyEditer.h"
 
 
-void easyEditer_lib::begin(String pageName)
+void easyEditer::begin(String pageName)
 {	
 	_edittext = "";
 	_page = pageName;
@@ -36,7 +36,7 @@ void easyEditer_lib::begin(String pageName)
 			content += F("\">Back to Editer</a><br><a href=\"/\">Back to top</a></div></body></html>");
 			Nefry.getWebServer()->send(200, "text/html", content);
 		}
-		setProgram();
+		setTrigger();
 	});
 	Nefry.getWebServer()->on(("/set_" + _page).c_str(), [&]() {
 		_edittext= Nefry.getWebServer()->arg("ee");
@@ -64,17 +64,30 @@ void easyEditer_lib::begin(String pageName)
 	Nefry.setIndexLink(_page.c_str(), ("/" + _page).c_str());
 }
 
-String easyEditer_lib::setProgram()
+String easyEditer::setTrigger()
 {
 	return compile(1);
 }
 
-String easyEditer_lib::compileTestProgram()
+
+void easyEditer::setProgram(String program)
+{
+	_edittext = program;
+}
+
+String easyEditer::compileTestProgram()
 {
 	return compile(0);
 }
 
-String easyEditer_lib::compile(bool run)
+
+
+String easyEditer::getProgram()
+{
+	return _edittext;
+}
+
+String easyEditer::compile(bool run)
 {
 	int  imode = -2;
 	char *tok,buf[_edittext.length()];
@@ -107,7 +120,7 @@ String easyEditer_lib::compile(bool run)
 	return F("Complete");
 }
 
-int easyEditer_lib::searchMode(const char * mode)
+int easyEditer::searchMode(const char * mode)
 {
 	//if (!strncmp("digitalRead",mode,11))return 0;
 	if (!strncmp("digitalWrite", mode,12))return 1;
@@ -116,7 +129,7 @@ int easyEditer_lib::searchMode(const char * mode)
 	if (!strncmp("delay", mode,5))return 4;
 	return -1;
 }
-int easyEditer_lib::stringTostate(int set,char *c) {
+int easyEditer::stringTostate(int set,char *c) {
 	int i;
 	char *ret;
 	String states;
@@ -129,14 +142,14 @@ int easyEditer_lib::stringTostate(int set,char *c) {
 		return -1;
 	}
 }
-String easyEditer_lib::stringTopin(int set,const char *c) {
+String easyEditer::stringTopin(int set,const char *c) {
 	String pins;
 	pins= c[set];
 	pins += c[set+1];
 	return pins;
 }
 
-int easyEditer_lib::createCode(int mode,  char * c, bool run)
+int easyEditer::createCode(int mode,  char * c, bool run)
 {
 	int state,pini;
 	switch (mode)
@@ -185,7 +198,7 @@ int easyEditer_lib::createCode(int mode,  char * c, bool run)
 	}
 }
 
-int easyEditer_lib::pinString(String s)
+int easyEditer::pinString(String s)
 {
 	s.toLowerCase();
 	if (s.equals("d0"))return D0;
@@ -197,7 +210,7 @@ int easyEditer_lib::pinString(String s)
 	return -1;
 }
 
-int easyEditer_lib::stateString(String s)
+int easyEditer::stateString(String s)
 {
 	s.toLowerCase();
 	if (s.equals("h"))return 1;
