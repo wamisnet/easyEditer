@@ -14,19 +14,21 @@ public:
 	String getProgram();
 	
 private:
+	
+	int convertPin(const char *s,int start),
+		convertValue(char *s, int start, const char end, bool  highorlow =0, int high=1023, int low=0,bool check=0);
+
+	int fastcount;
 	String _edittext;
 	String _page;
 	String compile(bool run);
+
 	int searchMode(const char* mode);
-	int stringTostate(int set, char * c);
-	String stringTopin(int set, const char * c);
 	int createCode(int mode,char* c,bool run);
 
-	int pinString(String s);
 
-	int stateString(String s);
 
-	String escapeParameter(String param);
+
 
 };
 #endif
