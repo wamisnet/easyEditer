@@ -8,7 +8,7 @@ public:
 	void begin(String pageName);
 
 	String setTrigger();
-	String compileTestProgram();
+	String compileProgram();
 
 	void setProgram(String program);
 	String getProgram();

@@ -13,7 +13,7 @@ void easyEditer::begin(String pageName)
 		content += _page;
 		content += F("</h1><form method='get' action='set_");
 		content += _page;
-		content += F("'><div class=\"row\"> <label for=\"ee\">Editer: </label> <div> <textarea name=\"ee\" rows=\"8\" cols=\"60\">");
+		content += F("'><div class=\"row\"> <label for=\"ee\">Program Editer: </label> <div> <textarea name=\"ee\" rows=\"8\" cols=\"57\">");
 		content += _edittext;
 		content.replace(";", ";\r\n");
 		content += F("</textarea> </div></div><div class=\"footer\"><button type = \"button\" onclick=\"location.href='/w");
@@ -30,7 +30,7 @@ void easyEditer::begin(String pageName)
 			content += _page;
 			content += F("…Test Program Start</h1>");
 			content += F("<p>Compile Result : ");
-			content += compileTestProgram();
+			content += compileProgram();
 			content += F("</p><a href=\"/");
 			content += _page;
 			content += F("\">Back to Editer</a><br><a href=\"/\">Back to top</a></div></body></html>");
@@ -52,7 +52,7 @@ void easyEditer::begin(String pageName)
 		_edittext.replace("\r\n", "");
 
 		content += F("</p><p>Compile Result : ");
-		content += compileTestProgram();
+		content += compileProgram();
 
 		content += F("	</p><a href=\"/");
 		content += _page;
@@ -75,7 +75,7 @@ void easyEditer::setProgram(String program)
 	_edittext = program;
 }
 
-String easyEditer::compileTestProgram()
+String easyEditer::compileProgram()
 {
 	return compile(0);
 }
