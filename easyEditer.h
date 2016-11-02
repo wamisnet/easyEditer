@@ -14,6 +14,10 @@ public:
 	String getProgram();
 	
 private:
+	
+	int convertPin(String s,int start),
+		convertValue(String s, bool boolean, int high, int low);
+
 	String _edittext;
 	String _page;
 	String compile(bool run);
@@ -26,7 +30,7 @@ private:
 
 	int stateString(String s);
 
-	String escapeParameter(String param);
+
 
 };
 #endif

@@ -87,6 +87,33 @@ String easyEditer::getProgram()
 	return _edittext;
 }
 
+int easyEditer::convertPin(String s,int start)
+{
+	s.toLowerCase();
+	if (s.equals("d0"))return D0;
+	else if (s.equals("d1"))return D1;
+	else if (s.equals("d2"))return D2;
+	else if (s.equals("d3"))return D3;
+	else if (s.equals("d4"))return D4;
+	else if (s.equals("d5"))return D5;
+	return -1;
+}
+
+int easyEditer::convertValue(String s,bool boolean,int high,int low)
+{
+	if (boolean == 1) {
+		s.toLowerCase();
+		if (s.equals("h"))return 1;
+		else if (s.equals("l"))return 0;
+		else if (s.equals("0"))return 0;
+		else if (s.equals("1"))return 1;
+		return 0;
+	}
+	else {
+		return s.toInt();
+	}
+}
+
 String easyEditer::compile(bool run)
 {
 	int  imode = -2;
@@ -122,6 +149,8 @@ String easyEditer::compile(bool run)
 
 int easyEditer::searchMode(const char * mode)
 {
+	//ここを配列にして検索をかける
+
 	//if (!strncmp("digitalRead",mode,11))return 0;
 	if (!strncmp("digitalWrite", mode,12))return 1;
 	//if (!strncmp("analogRead", mode,10))return 2;
