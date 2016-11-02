@@ -87,38 +87,61 @@ String easyEditer::getProgram()
 	return _edittext;
 }
 
-int easyEditer::convertPin(String s,int start)
+int easyEditer::convertPin(const char *s,int start)
 {
-	s.toLowerCase();
-	if (s.equals("d0"))return D0;
-	else if (s.equals("d1"))return D1;
-	else if (s.equals("d2"))return D2;
-	else if (s.equals("d3"))return D3;
-	else if (s.equals("d4"))return D4;
-	else if (s.equals("d5"))return D5;
+	String pins;
+	pins = s[start+ fastcount];
+	pins += s[start + fastcount + 1];
+	pins.toLowerCase();
+	if (pins.equals("d0"))return D0;
+	else if (pins.equals("d1"))return D1;
+	else if (pins.equals("d2"))return D2;
+	else if (pins.equals("d3"))return D3;
+	else if (pins.equals("d4"))return D4;
+	else if (pins.equals("d5"))return D5;
 	return -1;
 }
-
-int easyEditer::convertValue(String s,bool boolean,int high,int low)
-{
-	if (boolean == 1) {
-		s.toLowerCase();
-		if (s.equals("h"))return 1;
-		else if (s.equals("l"))return 0;
-		else if (s.equals("0"))return 0;
-		else if (s.equals("1"))return 1;
-		return 0;
+//(検索元文字列,（かっこからの文字列数,区切り文字,0or1,high,low,区切り無効化チェック)
+int easyEditer::convertValue(char *s, int start,const char end,bool highorlow,int high,int low,bool check)
+{	
+	char *ret;
+	String states;
+	if (check == 1) {
+		states = s;
+	} else {
+		if ((ret = strchr(s + start + fastcount, end)) != NULL) {
+			int i = ret - s + start + fastcount;//文字数
+			for (int j = start; j < i; j++)states += c[j];
+		}
+		else {
+			return -1;
+		}
 	}
-	else {
-		return s.toInt();
+	if (states.length() == 0) {
+		if (highorlow == 1) {
+			states.toLowerCase();
+			if (states.equals("high"))return 1;
+			else if (states.equals("low"))return 0;
+			else if (states.equals("0"))return 0;
+			else if (states.equals("1"))return 1;
+			return 0;
+		} else {
+			if (low <= states.toInt())
+				if (high >= states.toInt())
+					return states.toInt();//文字のときは0を返す
+				else
+					return high;
+			else
+				return low;
+		}
 	}
 }
 
 String easyEditer::compile(bool run)
 {
 	int  imode = -2;
-	char *tok,buf[_edittext.length()];
 	String err;
+	char *tok,buf[_edittext.length()];
 	_edittext.toCharArray(buf,_edittext.length());
 	tok = strtok(buf, ";");
 	while (tok != NULL) {
@@ -158,94 +181,57 @@ int easyEditer::searchMode(const char * mode)
 	if (!strncmp("delay", mode,5))return 4;
 	return -1;
 }
-int easyEditer::stringTostate(int set,char *c) {
-	int i;
-	char *ret;
-	String states;
-	if ((ret = strchr(c, ')')) != NULL) {
-		i = ret - c;
-		for (int j = set; j < i; j++)states += c[j];
-		return states.toInt();
-	}
-	else {
-		return -1;
-	}
-}
-String easyEditer::stringTopin(int set,const char *c) {
-	String pins;
-	pins= c[set];
-	pins += c[set+1];
-	return pins;
-}
+
 
 int easyEditer::createCode(int mode,  char * c, bool run)
 {
 	int state,pini;
-	switch (mode)
-	{
-	case 1:
-		if ((pini=pinString(stringTopin(13,c))) == -1)return -1;
-		if((state=stateString((String)c[16]))==-1)return -2;
+	char *ret;
+	if ((ret = strchr(c, '(')) != NULL) {
+		fastcount =ret - c;
+		switch (mode)
+		{
+		case 1:
+			if ((pini = convertPin(c, 1)) == -1)return -1;
+			if ((state = convertValue(c, 4,')',1))) == -1)return -2;
 
-		if (run == 1) {
-			pinMode(pini, OUTPUT);
-			digitalWrite(pini, state);
+			if (run == 1) {
+				pinMode(pini, OUTPUT);
+				digitalWrite(pini, state);
+			}
+
+			//Nefry.println(state);
+			//Nefry.println(pini);
+			return 0;
+			break;
+		case 3:
+
+			if ((pini = convertPin(c, 1)) == -1)return -1;
+			if ((state = convertValue(c,4,')')) == -1)return -2;
+
+			if (run == 1) {
+				analogWrite(pini, state);
+			}
+
+			//Nefry.println(state);
+			//Nefry.println(pini);
+			return 0;
+			break;
+		case 4:
+
+			if ((state = convertValue(c,1,')',1)) == -1)return -1;
+
+			if (run == 1) {
+				//Nefry.setLed(255, 0, 0);
+				Nefry.ndelay(state);
+				//Nefry.setLed(255, 255, 0);
+			}
+
+			//Nefry.println(state);
+			return 0;
+			break;
+		default:
+			break;
 		}
-
-		//Nefry.println(state);
-		//Nefry.println(pini);
-		return 0;
-		break;
-	case 3:
-
-		if ((pini = pinString(stringTopin(13, c))) == -1)return -1;
-		if ((state = stringTostate(15, c)) == -1)return -2;
-
-		if (run == 1) {
-			analogWrite(pini, state);
-		}
-
-		//Nefry.println(state);
-		//Nefry.println(pini);
-		return 0;
-		break;
-	case 4:
-		
-		if ((state= stringTostate(6, c))==-1)return -1;
-
-		if (run == 1) {
-			//Nefry.setLed(255, 0, 0);
-			Nefry.ndelay(state);
-			//Nefry.setLed(255, 255, 0);
-		}
-
-		//Nefry.println(state);
-		return 0;
-		break;
-	default:
-		break;
 	}
 }
-
-int easyEditer::pinString(String s)
-{
-	s.toLowerCase();
-	if (s.equals("d0"))return D0;
-	else if (s.equals("d1"))return D1;
-	else if (s.equals("d2"))return D2;
-	else if (s.equals("d3"))return D3;
-	else if (s.equals("d4"))return D4;
-	else if (s.equals("d5"))return D5;
-	return -1;
-}
-
-int easyEditer::stateString(String s)
-{
-	s.toLowerCase();
-	if (s.equals("h"))return 1;
-	else if (s.equals("l"))return 0;
-	else if (s.equals("0"))return 0;
-	else if (s.equals("1"))return 1;
-	return 0;
-}
-
