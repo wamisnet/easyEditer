@@ -111,7 +111,7 @@ int easyEditer::convertValue(char *s, int start,const char end,bool highorlow,in
 	} else {
 		if ((ret = strchr(s + start + fastcount, end)) != NULL) {
 			int i = ret - s + start + fastcount;//文字数
-			for (int j = start; j < i; j++)states += c[j];
+			for (int j = start; j < i; j++)states += s[j];
 		}
 		else {
 			return -1;
@@ -193,7 +193,7 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 		{
 		case 1:
 			if ((pini = convertPin(c, 1)) == -1)return -1;
-			if ((state = convertValue(c, 4,')',1))) == -1)return -2;
+			if ((state = convertValue(c, 4,')',1)) == -1)return -2;
 
 			if (run == 1) {
 				pinMode(pini, OUTPUT);
