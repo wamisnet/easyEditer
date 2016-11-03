@@ -24,6 +24,15 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 		spt =ret - c+1;
 		switch (mode)
 		{
+		case 0:
+			if ((pini = convertPin(c)) == -1)return -1;
+			if (run == 1) {
+				pinMode(pini, INPUT);
+				returnString += digitalRead(pini);
+				returnString += ":";
+			}
+			return 0;
+			break;
 		case 1:
 			if ((pini = convertPin(c)) == -1)return -1;
 			if ((state = convertValue(c,')',1)) == -1)return -2;
@@ -34,6 +43,13 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			}			
 			//Nefry.println(state);
 			//Nefry.println(pini);
+			return 0;
+			break;
+		case 2:
+			if (run == 1) {
+				returnString += analogRead(A0);
+				returnString += ":";
+			}
 			return 0;
 			break;
 		case 3:
@@ -90,6 +106,7 @@ String easyEditer::compile(bool run)
 	err.toCharArray(buf, err.length());
 	err = "";
 	tok = strtok(buf, ";");
+	returnString = "";
 	while (tok != NULL) {
 		Nefry.ndelay(1);
 
