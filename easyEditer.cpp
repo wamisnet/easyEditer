@@ -4,7 +4,8 @@ String functionPointer[] = {
 	"digitalwrite",
 	"analogread",
 	"analogwrite",
-	"delay"
+	"delay",
+	"nefry.setled"
 };
 //関数を検索します。
 int easyEditer::searchMode(const char * mode){
@@ -17,15 +18,15 @@ int easyEditer::searchMode(const char * mode){
 
 int easyEditer::createCode(int mode,  char * c, bool run)
 {
-	int state,pini;
+	int state,pini,st[5];
 	char *ret;
 	if ((ret = strchr(c, '(')) != NULL) {
-		fastcount =ret - c;
+		spt =ret - c+1;
 		switch (mode)
 		{
 		case 1:
-			if ((pini = convertPin(c, 1)) == -1)return -1;
-			if ((state = convertValue(c, 4,')',1)) == -1)return -2;
+			if ((pini = convertPin(c)) == -1)return -1;
+			if ((state = convertValue(c,')',1)) == -1)return -2;
 
 			if (run == 1) {
 				pinMode(pini, OUTPUT);
@@ -37,8 +38,8 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			break;
 		case 3:
 
-			if ((pini = convertPin(c, 0)) == -1)return -1;
-			if ((state = convertValue(c,3,')')) == -1)return -2;
+			if ((pini = convertPin(c)) == -1)return -1;
+			if ((state = convertValue(c,')')) == -1)return -2;
 
 			if (run == 1) {
 				analogWrite(pini, state);
@@ -50,7 +51,7 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			break;
 		case 4:
 
-			if ((state = convertValue(c,1,')')) == -1)return -1;
+			if ((state = convertValue(c,')',0, 32767)) == -1)return -1;
 
 			if (run == 1) {
 				//Nefry.setLed(255, 0, 0);
@@ -60,7 +61,19 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			//Nefry.println(state);
 			return 0;
 			break;
+		case 5:
+			if ((st[0] = convertValue(c, ',', 0, 255)) == -1)return -1;
+			if ((st[1] = convertValue(c, ',', 0, 255)) == -1)return -2;
+			if ((st[2] = convertValue(c, ')', 0, 255)) == -1)return -3;
+
+			if (run == 1) {
+				Nefry.setLed(st[0], st[1], st[2]);
+			}
+
+			return 0;
+			break;
 		default:
+			return -1;
 			break;
 		}
 	}
@@ -99,6 +112,11 @@ String easyEditer::compile(bool run)
 			err += F(" : The second argument Err");
 			return err;
 			break;
+		case -3:
+			err = tok;
+			err += F(" : The third argument Err");
+			return err;
+			break;
 		case 0:
 			break;
 		}
@@ -108,11 +126,12 @@ String easyEditer::compile(bool run)
 }
 
 //プログラムの引数のピン番号を数値化する。
-int easyEditer::convertPin(const char *s, int start)
+int easyEditer::convertPin(const char *s)
 {
 	String pins;
-	pins = s[start + fastcount];
-	pins += s[start + fastcount + 1];
+	pins = s[spt];
+	pins += s[spt+1];
+	spt+=3;
 	pins.toLowerCase();
 	if (pins.equals("d0"))return D0;
 	else if (pins.equals("d1"))return D1;
@@ -124,8 +143,8 @@ int easyEditer::convertPin(const char *s, int start)
 }
 
 //プログラムの引数を数値化する。
-//(検索元文字列,（かっこからの文字列数,区切り文字,0or1,high,low,区切り無効化チェック)
-int easyEditer::convertValue(char *s, int start, const char end, bool highorlow, int high, int low, bool check)
+//(検索元文字列,区切り文字,0or1,high,low,区切り無効化チェック)
+int easyEditer::convertValue(char *s, const char end, bool highorlow, int high, int low, bool check)
 {
 	char *ret;
 	String states;
@@ -133,15 +152,16 @@ int easyEditer::convertValue(char *s, int start, const char end, bool highorlow,
 		states = s;
 	}
 	else {
-		if ((ret = strchr(s + start + fastcount, end)) != NULL) {
+		if ((ret = strchr(s +spt, end)) != NULL) {
 			int i = ret - s;//終了文字
-			for (int j = start + fastcount; j < i; j++)states += s[j];
+			for (int j = spt; j < i; j++)states += s[j];
+			spt = i+1;
 		}
 		else {
 			return -1;
 		}
 	}
-
+	//Nefry.println(states);
 	if (states.length() != 0) {
 		if (highorlow == 1) {
 			states.toLowerCase();
