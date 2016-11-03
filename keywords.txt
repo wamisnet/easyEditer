@@ -15,7 +15,7 @@ setTrigger			KEYWORD2
 compileProgram			KEYWORD2
 setProgram			KEYWORD2
 getProgram			KEYWORD2
-
+getValue			KEYWORD2
 
 #######################################
 # Constants
