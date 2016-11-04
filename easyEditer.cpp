@@ -5,10 +5,11 @@ String functionPointer[] = {
 	"analogread",
 	"analogwrite",
 	"delay",
-	"nefry.setled"
+	"nefry.setled",
+	"if"
 };
 //関数を検索します。
-int easyEditer::searchMode(const char * mode){
+int easyEditer::searchMode(const char * mode) {
 	for (int i = 0; i < (sizeof functionPointer / sizeof functionPointer[0]); i++) {
 		if (!strncmp(functionPointer[i].c_str(), mode, functionPointer[i].length()))return i;
 	}
@@ -16,12 +17,12 @@ int easyEditer::searchMode(const char * mode){
 }
 
 
-int easyEditer::createCode(int mode,  char * c, bool run)
+int easyEditer::createCode(int mode, char * c, bool run)
 {
-	int state,pini,st[5];
+	int state, pini, st[5];
 	char *ret;
 	if ((ret = strchr(c, '(')) != NULL) {
-		spt =ret - c+1;
+		spt = ret - c + 1;
 		switch (mode)
 		{
 		case 0:
@@ -35,12 +36,12 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			break;
 		case 1:
 			if ((pini = convertPin(c)) == -1)return -1;
-			if ((state = convertValue(c,')',1)) == -1)return -2;
+			if ((state = convertValue(c, ')', 1)) == -1)return -2;
 
 			if (run == 1) {
 				pinMode(pini, OUTPUT);
 				digitalWrite(pini, state);
-			}			
+			}
 			//Nefry.println(state);
 			//Nefry.println(pini);
 			return 0;
@@ -55,7 +56,7 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 		case 3:
 
 			if ((pini = convertPin(c)) == -1)return -1;
-			if ((state = convertValue(c,')')) == -1)return -2;
+			if ((state = convertValue(c, ')')) == -1)return -2;
 
 			if (run == 1) {
 				analogWrite(pini, state);
@@ -67,7 +68,7 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 			break;
 		case 4:
 
-			if ((state = convertValue(c,')',0, 32767)) == -1)return -1;
+			if ((state = convertValue(c, ')', 0, 32767)) == -1)return -1;
 
 			if (run == 1) {
 				//Nefry.setLed(255, 0, 0);
@@ -88,6 +89,10 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 
 			return 0;
 			break;
+		case 6:
+
+			return 0;
+			break;
 		default:
 			return -1;
 			break;
@@ -95,17 +100,31 @@ int easyEditer::createCode(int mode,  char * c, bool run)
 	}
 }
 
+bool easyEditer::convertIf(const char * s)
+{
+	//if文の条件式を検索
+	//else文をどうするか
+	//flgをたてる方向で作成する
+	//グローバル変数を1つ用意し、elseに入るときだけフラグをたてる
+	char *ret;
+	if ((ret = strstr(c, "==")) != NULL) {
+
+	}
+
+	return false;
+}
+
 //プログラムをコンパイルします。
 String easyEditer::compile(bool run)
 {
 	int  imode = -2;
 	String err;
-	err= _edittext;
+	err = _edittext;
 	err.toLowerCase();
 	char *tok, buf[err.length()];
 	err.toCharArray(buf, err.length());
 	err = "";
-	tok = strtok(buf, ";");
+	tok = strtok(buf, ";}");
 	returnString = "";
 	while (tok != NULL) {
 		Nefry.ndelay(1);
@@ -137,7 +156,7 @@ String easyEditer::compile(bool run)
 		case 0:
 			break;
 		}
-		tok = strtok(NULL, ";");
+		tok = strtok(NULL, ";}");
 	}
 	return F("Complete");
 }
@@ -147,8 +166,8 @@ int easyEditer::convertPin(const char *s)
 {
 	String pins;
 	pins = s[spt];
-	pins += s[spt+1];
-	spt+=3;
+	pins += s[spt + 1];
+	spt += 3;
 	pins.toLowerCase();
 	if (pins.equals("d0"))return D0;
 	else if (pins.equals("d1"))return D1;
@@ -169,10 +188,10 @@ int easyEditer::convertValue(char *s, const char end, bool highorlow, int high, 
 		states = s;
 	}
 	else {
-		if ((ret = strchr(s +spt, end)) != NULL) {
+		if ((ret = strchr(s + spt, end)) != NULL) {
 			int i = ret - s;//終了文字
 			for (int j = spt; j < i; j++)states += s[j];
-			spt = i+1;
+			spt = i + 1;
 		}
 		else {
 			return -1;
@@ -201,11 +220,11 @@ int easyEditer::convertValue(char *s, const char end, bool highorlow, int high, 
 	else return -1;
 }
 
-void easyEditer::begin(String pageName)
+void easyEditer::begin(String pageName, ESP8266WebServer* webServer)
 {
 	_edittext = "";
 	_page = pageName;
-	Nefry.getWebServer()->on(("/" + _page).c_str(), [&]() {
+	webServer->on(("/" + _page).c_str(), [&]() {
 		String content = F(
 			"<!DOCTYPE HTML><html><head><meta charset=\"UTF-8\">"
 			"<title>NefryEasyEditer</title><link rel = \"stylesheet\" type = \"text/css\" href = \"/nefry_css\">"
@@ -219,9 +238,9 @@ void easyEditer::begin(String pageName)
 		content += F("</textarea> </div></div><div class=\"footer\"><button type = \"button\" onclick=\"location.href='/w");
 		content += _page;
 		content += F("'\">Program Start</button><input type=\"submit\" value=\"Save\"> </div></form><a href=\"/\">Back to top</a></div></body></html>");
-		Nefry.getWebServer()->send(200, "text/html", content);
+		webServer->send(200, "text/html", content);
 	});
-	Nefry.getWebServer()->on(("/w" + _page).c_str(), [&]() {
+	webServer->on(("/w" + _page).c_str(), [&]() {
 		if (1) {
 			String content = F(
 				"<!DOCTYPE HTML><html><head><meta charset=\"UTF-8\">"
@@ -234,12 +253,12 @@ void easyEditer::begin(String pageName)
 			content += F("</p><a href=\"/");
 			content += _page;
 			content += F("\">Back to Editer</a><br><a href=\"/\">Back to top</a></div></body></html>");
-			Nefry.getWebServer()->send(200, "text/html", content);
+			webServer->send(200, "text/html", content);
 		}
 		setTrigger();
 	});
-	Nefry.getWebServer()->on(("/set_" + _page).c_str(), [&]() {
-		_edittext = Nefry.getWebServer()->arg("ee");
+	webServer->on(("/set_" + _page).c_str(), [&]() {
+		_edittext = webServer->arg("ee");
 		String content = F(
 			"<!DOCTYPE HTML><html><head><meta charset=\"UTF-8\">"
 			"<title>NefryEasyEditer</title><link rel = \"stylesheet\" type = \"text/css\" href = \"/nefry_css\">"
@@ -261,7 +280,7 @@ void easyEditer::begin(String pageName)
 		content += F("\">Back to NefryEasyEditer</a><br><a href=\"/\">Back to top</a></div></body></html>");
 		_edittext.replace(" ", "");
 		_edittext.replace("\r\n", "");
-		Nefry.getWebServer()->send(200, "text/html", content);
+		webServer->send(200, "text/html", content);
 	});
 	Nefry.setIndexLink(_page.c_str(), ("/" + _page).c_str());
 }
