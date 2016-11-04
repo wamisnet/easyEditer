@@ -72,21 +72,21 @@ int easyEditer::createCode(int mode, char * c, bool run)
 
 			if (run == 1) {
 				//Nefry.setLed(255, 0, 0);
-				Nefry.ndelay(state);
+				delay(state);
 				//Nefry.setLed(255, 255, 0);
 			}
 			//Nefry.println(state);
 			return 0;
 			break;
 		case 5:
-			if ((st[0] = convertValue(c, ',', 0, 255)) == -1)return -1;
+			/*if ((st[0] = convertValue(c, ',', 0, 255)) == -1)return -1;
 			if ((st[1] = convertValue(c, ',', 0, 255)) == -1)return -2;
 			if ((st[2] = convertValue(c, ')', 0, 255)) == -1)return -3;
 
 			if (run == 1) {
 				Nefry.setLed(st[0], st[1], st[2]);
 			}
-
+			*/
 			return 0;
 			break;
 		case 6:
@@ -127,7 +127,7 @@ String easyEditer::compile(bool run)
 	tok = strtok(buf, ";}");
 	returnString = "";
 	while (tok != NULL) {
-		Nefry.ndelay(1);
+		delay(1);
 
 		//関数を検索
 		if ((imode = searchMode(tok)) == -1) {
