@@ -1,18 +1,19 @@
-#include<easyEditer.h>
+﻿#include<easyEditer.h>
 easyEditer editer;
 
 /*
    easyEditerを試してみるサンプルプログラム
    2016/10/20
 */
-
+ESP8266WebServer server;
 void setup() {
-  editer.begin("NefryEditer");//easyEditerを使えるようにします。
+  editer.begin("NefryEditer",server);//easyEditerを使えるようにします。
+  pinMode(14,INPUT_PULLUP);
 }
 
 void loop() {
-  if (Nefry.push_SW()) {
-    //NefryのSWを押したときにeasyEditerを実行します。
+  if (digitalRead(14)==LOW) {
+    //14pinがLOWになったときにeasyEditerを実行します。
     editer.setTrigger();//easyEditerを使えるようにします。
   }
 }
