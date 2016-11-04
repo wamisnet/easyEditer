@@ -107,7 +107,7 @@ bool easyEditer::convertIf(const char * s)
 	//flgをたてる方向で作成する
 	//グローバル変数を1つ用意し、elseに入るときだけフラグをたてる
 	char *ret;
-	if ((ret = strstr(c, "==")) != NULL) {
+	if ((ret = strstr(s, "==")) != NULL) {
 
 	}
 
