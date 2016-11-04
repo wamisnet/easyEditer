@@ -282,6 +282,5 @@ void easyEditer::begin(String pageName, ESP8266WebServer* webServer)
 		_edittext.replace("\r\n", "");
 		webServer->send(200, "text/html", content);
 	});
-	Nefry.setIndexLink(_page.c_str(), ("/" + _page).c_str());
 }
 
