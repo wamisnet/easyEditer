@@ -1,4 +1,4 @@
-﻿#include<easyEditer.h>
+#include<easyEditer.h>
 easyEditer editer;
 
 /*
@@ -7,7 +7,7 @@ easyEditer editer;
 */
 ESP8266WebServer server;
 void setup() {
-  editer.begin("NefryEditer",server);//easyEditerを使えるようにします。
+  editer.begin("NefryEditer",&server);//easyEditerを使えるようにします。
   pinMode(14,INPUT_PULLUP);
 }
 
